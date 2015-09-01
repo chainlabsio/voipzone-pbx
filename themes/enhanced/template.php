@@ -1701,7 +1701,7 @@ if (strlen($_SESSION['message']) > 0) {
 	</div>
 
 	<?php
-	$footer .= "&copy; Copyright 2008 - ".date("Y")." <a href='http://www.fusionpbx.com' class='footer' target='_blank'>fusionpbx.com</a>. All rights reserved.\n";
+	$footer .= "Powered by <a href='' class='footer' target='_blank'>Chance Telecom</a>.\n";
 	echo "<div id='footer' style='position: absolute; z-index; 10000;'><span class='footer'>".$footer."</span></div>\n";
 	if (isset($_SESSION['theme']['bottom_html']['text'])){
 		echo $_SESSION['theme']['bottom_html']['text'];
