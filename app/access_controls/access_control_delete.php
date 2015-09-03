@@ -21,22 +21,14 @@ else {
 		$id = check_str($_GET["id"]);
 	}
 
-//delete the data
-	if (strlen($id)>0) {
-		//delete access_control
-			$sql = "delete from v_access_controls ";
-			$sql .= "where access_control_uuid = '$id' ";
-			$prep_statement = $db->prepare(check_sql($sql));
-			$prep_statement->execute();
-			unset($sql);
-
-		//delete access_control_node
-			$sql = "delete from v_access_control_nodes ";
-			$sql .= "where access_control_uuid = '$id' ";
-			$prep_statement = $db->prepare(check_sql($sql));
-			$prep_statement->execute();
-			unset($sql);
-	}
+if (strlen($id)>0) {
+	//delete access_control
+		$sql = "delete from v_access_controls ";
+		$sql .= "where access_control_uuid = '$id' ";
+		$prep_statement = $db->prepare(check_sql($sql));
+		$prep_statement->execute();
+		unset($sql);
+}
 
 //redirect the user
 	$_SESSION['message'] = $text['message-delete'];

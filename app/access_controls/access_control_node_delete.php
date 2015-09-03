@@ -22,17 +22,18 @@ else {
 		$access_control_uuid = check_str($_GET["access_control_uuid"]);
 	}
 
-//delete access_control_node
-	if (strlen($id)>0) {
+if (strlen($id)>0) {
+	//delete access_control_node
 		$sql = "delete from v_access_control_nodes ";
 		$sql .= "where access_control_node_uuid = '$id' ";
 		$prep_statement = $db->prepare(check_sql($sql));
 		$prep_statement->execute();
 		unset($sql);
-	}
+}
 
 //redirect the user
 	$_SESSION['message'] = $text['message-delete'];
 	header('Location: access_control_node_edit.php?id='.$access_control_uuid);
+
 
 ?>

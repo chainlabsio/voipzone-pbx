@@ -81,7 +81,7 @@
 			end
 			status = dbh:query(sql, function(row)
 				extension = row.extension;
-				number_alias = row.number_alias or '';
+				number_alias = row.number_alias;
 				accountcode = row.accountcode;
 				follow_me_uuid = row.follow_me_uuid;
 				--freeswitch.consoleLog("NOTICE", "[call forward] extension "..row.extension.."\n");
@@ -165,9 +165,6 @@
 		--clear the cache
 			if (extension ~= nil) then
 				api:execute("memcache", "delete directory:"..extension.."@"..domain_name);
-				if #number_alias > 0 then
-					api:execute("memcache", "delete directory:"..number_alias.."@"..domain_name);
-				end
 			end
 	
 		--wait for the file to be written before proceeding
