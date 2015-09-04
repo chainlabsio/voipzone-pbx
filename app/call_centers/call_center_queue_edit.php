@@ -958,7 +958,25 @@ if (count($_POST)>0 && strlen($_POST["persistformvar"]) == 0) {
 	echo "  ".$text['label-caller_announce_sound']."\n";
 	echo "</td>\n";
 	echo "<td class='vtable' align='left'>\n";
-	echo "  <input class='formfld' type='text' name='queue_announce_sound' maxlength='255' value='$queue_announce_sound'>\n";
+	echo "	<select name='queue_announce_sound' class='formfld'>\n";
+	echo "		<option></option>\n";
+	if($dh = opendir($_SESSION['switch']['recordings']['dir']."/")) {
+		$files = Array();
+		while ($file = readdir($dh)) {
+			if ($file != "." && $file != ".." && $file[0] != '.') {
+				if (!is_dir($_SESSION['switch']['recordings']['dir']."/".$file)) {
+					if ($queue_announce_sound == $_SESSION['switch']['recordings']['dir']."/".$file && strlen($queue_announce_sound) > 0) {
+						echo "	<option value='".$_SESSION['switch']['recordings']['dir']."/".$file."' selected='selected'>".$file."</option>\n";
+					}
+					else {
+						echo "	<option value='".$_SESSION['switch']['recordings']['dir']."/".$file."'>".$file."</option>\n";
+					}
+				}
+			}
+		}
+		closedir($dh);
+	}
+	echo "	</select>\n";
 	echo "<br />\n";
 	echo $text['description-caller_announce_sound']."\n";
 	echo "</td>\n";
