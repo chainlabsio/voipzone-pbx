@@ -141,6 +141,7 @@ else {
 					echo "<th>".$text['label-options']."</th>\n";
 				}
 				echo "</tr>\n";
+				$idel_agents = 0;
 				foreach ($tier_result as $tier_row) {
 					//$queue = $tier_row['queue'];
 					//$queue = str_replace('@'.$_SESSION['domain_name'], '', $queue);
@@ -163,6 +164,7 @@ else {
 							$a_exten = preg_replace("/{.*}/", "", $a_exten);
 							$status = $agent_row['status'];
 							$state = $agent_row['state'];
+							if ($state == "Waiting") {$idel_agents++;}
 							$max_no_answer = $agent_row['max_no_answer'];
 							$wrap_up_time = $agent_row['wrap_up_time'];
 							$reject_delay_time = $agent_row['reject_delay_time'];
@@ -267,6 +269,7 @@ else {
 					$q_waiting += ($state == "Waiting") ? 1 : 0;
 					$q_answered += ($state == "Answered") ? 1 : 0;
 				}
+				echo "		<strong>".$text['label-idle-agents'].":</strong> <b>".$idel_agents."</b>&nbsp;&nbsp;&nbsp;";
 				echo "		<strong>".$text['label-waiting'].":</strong> <b>".$q_waiting."</b>&nbsp;&nbsp;&nbsp;";
 				echo "		<strong>".$text['label-trying'].":</strong> <b>".$q_trying."</b>&nbsp;&nbsp;&nbsp; ";
 				echo "		<strong>".$text['label-answered'].":</strong> <b>".$q_answered."</b>";
