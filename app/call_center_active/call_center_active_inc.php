@@ -164,7 +164,7 @@ else {
 							$a_exten = preg_replace("/{.*}/", "", $a_exten);
 							$status = $agent_row['status'];
 							$state = $agent_row['state'];
-							if ($state == "Waiting") {$idel_agents++;}
+							if ($status == "Available" && $state == "Waiting") {$idel_agents++;}
 							$max_no_answer = $agent_row['max_no_answer'];
 							$wrap_up_time = $agent_row['wrap_up_time'];
 							$reject_delay_time = $agent_row['reject_delay_time'];
