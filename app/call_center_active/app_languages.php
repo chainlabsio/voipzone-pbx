@@ -33,7 +33,9 @@ $text['message-confirm']['de-at'] = "Wollen Sie das wirklich tun?";
 $text['message-confirm']['ar-eg'] = "";
 $text['message-confirm']['he'] = "";
 
-$text['label-waiting']['en-us'] = "Waiting";
+$text['label-idle-agents']['en-us'] = "Idle Agents";
+
+$text['label-waiting']['en-us'] = "Customers Waiting";
 $text['label-waiting']['es-cl'] = "Esperando";
 $text['label-waiting']['fr-fr'] = "d'attente";
 $text['label-waiting']['pt-pt'] = "Espera";
@@ -44,7 +46,7 @@ $text['label-waiting']['de-at'] = "Warten";
 $text['label-waiting']['ar-eg'] = "انتظار";
 $text['label-waiting']['he'] = "";
 
-$text['label-trying']['en-us'] = "Trying";
+$text['label-trying']['en-us'] = "Customers Trying";
 $text['label-trying']['es-cl'] = "Intentando";
 $text['label-trying']['fr-fr'] = "d'essais";
 $text['label-trying']['pt-pt'] = "Tentar";
@@ -385,7 +387,7 @@ $text['label-call']['de-at'] = "Anruf";
 $text['label-call']['ar-eg'] = "";
 $text['label-call']['he'] = "שיחה";
 
-$text['label-answered']['en-us'] = "Answered";
+$text['label-answered']['en-us'] = "Customers Answered";
 $text['label-answered']['es-cl'] = "Respondido";
 $text['label-answered']['fr-fr'] = "Répondu";
 $text['label-answered']['pt-pt'] = "Atendidas";
