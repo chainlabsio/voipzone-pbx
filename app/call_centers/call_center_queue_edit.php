@@ -297,11 +297,36 @@ if (count($_POST)>0 && strlen($_POST["persistformvar"]) == 0) {
 				$sql .= "and call_center_queue_uuid = '$call_center_queue_uuid'";
 				$db->exec(check_sql($sql));
 				unset($sql);
-
-			//get the dialplan_uuid
-				$sql = "select * from v_call_center_queues ";
+				
+ 			//get the dialplan_uuid
+				$sql = "select dialplan_uuid from v_dialplans ";
 				$sql .= "where domain_uuid = '".$_SESSION['domain_uuid']."' ";
-				$sql .= "and call_center_queue_uuid = '$call_center_queue_uuid' ";
+				$sql .= "and dialplan_name = '$queue_name' ";
+				$sql .= "and dialplan_number = '$queue_extension' ";
+				$prep_statement = $db->prepare(check_sql($sql));
+				$prep_statement->execute();
+				$result = $prep_statement->fetchAll(PDO::FETCH_NAMED);
+				foreach ($result as &$row) {
+					$dialplan_uuid = $row["dialplan_uuid"];
+				}
+
+			//dialplan add or update
+				$c = new call_center;
+				$c->db = $db;
+				$c->domain_uuid = $_SESSION['domain_uuid'];
+				$c->dialplan_uuid = $dialplan_uuid;
+				$c->queue_name = $queue_name;
+				$c->queue_cid_prefix = $queue_cid_prefix;
+				$c->queue_timeout_action = $queue_timeout_action;
+				$c->queue_description = $queue_description;
+				$c->destination_number = $queue_extension;
+				$a = $c->dialplan();
+				
+			//get the dialplan_uuid
+				$sql = "select dialplan_uuid from v_dialplans ";
+				$sql .= "where domain_uuid = '".$_SESSION['domain_uuid']."' ";
+				$sql .= "and dialplan_name = '$queue_name' ";
+				$sql .= "and dialplan_number = '$queue_extension' ";
 				$prep_statement = $db->prepare(check_sql($sql));
 				$prep_statement->execute();
 				$result = $prep_statement->fetchAll(PDO::FETCH_NAMED);
@@ -309,20 +334,12 @@ if (count($_POST)>0 && strlen($_POST["persistformvar"]) == 0) {
 					$dialplan_uuid = $row["dialplan_uuid"];
 				}
 				unset ($prep_statement);
-
-			//dialplan add or update
-				$c = new call_center;
-				$c->db = $db;
-				$c->domain_uuid = $_SESSION['domain_uuid'];
-				$c->call_center_queue_uuid = $call_center_queue_uuid;
-				$c->dialplan_uuid = $dialplan_uuid;
-				$c->queue_name = $queue_name;
-				$c->queue_name = $queue_name;
-				$c->queue_cid_prefix = $queue_cid_prefix;
-				$c->queue_timeout_action = $queue_timeout_action;
-				$c->queue_description = $queue_description;
-				$c->destination_number = $queue_extension;
-				$a = $c->dialplan();
+		
+			//insert dialplan_uuid
+				$sql = "update v_call_center_queues set ";
+				$sql .= "dialplan_uuid = '$dialplan_uuid' ";
+				$db->exec(check_sql($sql));
+				unset($sql);
 
 			//synchronize the configuration
 				save_call_center_xml();
