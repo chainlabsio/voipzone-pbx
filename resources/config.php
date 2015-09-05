@@ -47,7 +47,7 @@
 		$db_port = '5432';
 		$db_name = 'fusionpbx';
 		$db_username = 'fusionpbx';
-		$db_password = '68dfcaec53';
+		$db_password = '.V20n32oo5.';
 
 	//show errors
 		ini_set('display_errors', '1');
