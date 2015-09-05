@@ -49,7 +49,6 @@ if (
 if (sizeof($_POST) > 0) {
 
 	$do = $_POST['do'];
-
 	// run source update
 	if ($do["source"] && permission_exists("upgrade_source") && !is_dir("/usr/share/examples/fusionpbx")) {
 		chdir("/var/www/fusionpbx/");
