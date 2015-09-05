@@ -90,3 +90,5 @@ chmod 755 install_fusionpbx.sh
 Installation Questions:
 - During the install it will ask you to press continue after verifying that the command ran successfully. This is usually the case, so you can simply tell it to continue. The install also asks several questions. 
 - Unless you have a reason to choose otherwise, PostgreSQL and Nginx is probably your best path and is recommended by the developers of FusionPBX
+# voipzone-pbx
+# voipzone-pbx
