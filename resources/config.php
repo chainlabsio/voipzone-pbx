@@ -43,11 +43,11 @@
 		//$db_password = '';
 
 	//pgsql: database connection information
-		$db_host = 'localhost'; //set the host only if the database is not local
-		$db_port = '5432';
-		$db_name = 'fusionpbx';
-		$db_username = 'fusionpbx';
-		$db_password = '68dfcaec53';
+		$db_host = ''; //set the host only if the database is not local
+		$db_port = '';
+		$db_name = '';
+		$db_username = '';
+		$db_password = '';
 
 	//show errors
 		ini_set('display_errors', '1');
