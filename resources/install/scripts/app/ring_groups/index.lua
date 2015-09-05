@@ -69,16 +69,18 @@
 	if (not default_voice) then default_voice = 'callie'; end
 
 --get record_ext
-	record_ext = session:getVariable("record_ext");
-	if (not record_ext) then
+	if (session:getVariable("record_ext")) then
+		record_ext = session:getVariable("record_ext");
+	else
 		record_ext = "wav";
 	end
 
 --set the recording path
-	recording_archive = recordings_dir .. "/" .. domain_name .. "/archive/" .. os.date("%Y/%b/%d");
-
---set the recording file
-	record_file = recording_archive:gsub("\\", "/") .. "/" .. uuid .. "." .. record_ext
+	recording_archive = recordings_dir
+	if (domain_count > 1) then
+		recording_archive = recording_archive.."/"..domain_name;
+	end
+	recording_archive = recording_archive.."/archive/"..(os.date("%Y")).."/"..(os.date("%b")).."/"..(os.date("%d"));
 
 --prepare the api object
 	api = freeswitch.API();
@@ -345,7 +347,6 @@
 					cmd = "user_data ".. destination_number .."@"..domain_name.." var user_record";
 					user_record = trim(api:executeString(cmd));
 					--set the record_session variable
-					record_session = false;
 					if (user_record == "all") then
 						record_session = true;
 					end
@@ -361,11 +362,9 @@
 
 				--record the session
 					if (record_session) then
-						record_session = ",api_on_answer='uuid_record "..uuid.." start ".. record_file .. "'";
-					else 
-						record_session = ""
+						cmd = "uuid_record "..uuid.." start "..recording_archive.."/"..uuid.."."..record_ext;
+						response = api:executeString(cmd);
 					end
-					row.record_session = record_session
 
 				--process according to user_exists, sip_uri, external number
 					if (user_exists == "true") then
@@ -373,27 +372,26 @@
 						cmd = "user_data ".. destination_number .."@"..domain_name.." var extension_uuid";
 						extension_uuid = trim(api:executeString(cmd));
 						--send to user
-						local dial_string_to_user = "[sip_invite_domain="..domain_name..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay..",dialed_extension=" .. row.destination_number .. ",extension_uuid="..extension_uuid .. row.record_session .. "]user/" .. row.destination_number .. "@" .. domain_name;
 						if (ring_group_skip_active ~= nil) then
 							if (ring_group_skip_active == "true") then
 								cmd = "show channels like "..destination_number;
 								reply = trim(api:executeString(cmd));
 								--freeswitch.consoleLog("notice", "[ring group] reply "..cmd.." " .. reply .. "\n");
 								if (reply == "0 total.") then
-									dial_string = dial_string_to_user
+									dial_string = "[sip_invite_domain="..domain_name..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay..",dialed_extension=" .. row.destination_number .. ",extension_uuid="..extension_uuid.."]user/" .. row.destination_number .. "@" .. domain_name;
 								else
 									if (string.find(reply, domain_name)) then
 										--active call
 									else
-										dial_string = dial_string_to_user;
+										dial_string = "[sip_invite_domain="..domain_name..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay..",dialed_extension=" .. row.destination_number .. ",extension_uuid="..extension_uuid.."]user/" .. row.destination_number .. "@" .. domain_name;
 									end
 								end
 							else
 								--look inside the reply to check for the correct domain_name
-									dial_string = dial_string_to_user;
+									dial_string = "[sip_invite_domain="..domain_name..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay..",dialed_extension=" .. row.destination_number .. ",extension_uuid="..extension_uuid.."]user/" .. row.destination_number .. "@" .. domain_name;
 							end
 						else
-							dial_string = dial_string_to_user;
+							dial_string = "[sip_invite_domain="..domain_name..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay..",dialed_extension=" .. row.destination_number .. ",extension_uuid="..extension_uuid.."]user/" .. row.destination_number .. "@" .. domain_name;
 						end
 					elseif (tonumber(destination_number) == nil) then
 						--sip uri
@@ -493,22 +491,11 @@
 					session:execute("set", "hangup_after_bridge=true");
 					session:execute("set", "continue_on_fail=true");
 
-					local bind_target = 'both'
-					-- if session:getVariable("sip_authorized") ~= "true" then
-					-- 	bind_target = 'peer'
-					-- end
-
-				--set bind digit action
-					local bindings = {
-						"local,*1,exec:execute_extension,dx XML " .. context,
-						"local,*2,exec:record_session," .. record_file,
-						"local,*3,exec:execute_extension,cf XML " .. context,
-						"local,*4,exec:execute_extension,att_xfer XML " .. context,
-					}
-					for _, str in ipairs(bindings) do
-						session:execute("bind_digit_action", str .. "," .. bind_target)
-					end
-					session:execute("digit_action_set_realm", "local")
+				--set bind meta app
+					session:execute("bind_meta_app", "1 ab s execute_extension::dx XML "..context);
+					session:execute("bind_meta_app", "2 ab s record_session::"..recordings_dir.."/archive/"..os.date("%Y").."/"..os.date("%m").."/"..os.date("%d").."}/"..uuid..".wav");
+					session:execute("bind_meta_app", "3 ab s execute_extension::cf XML "..context);
+					session:execute("bind_meta_app", "4 ab s execute_extension::att_xfer XML "..context);
 
 					--if the user is busy rollover to the next destination
 						if (ring_group_strategy == "rollover") then
@@ -539,7 +526,7 @@
 
 								--send the call to the destination
 									if (user_exists == "true") then
-										dial_string = "["..group_confirm.."sip_invite_domain="..domain_name..",dialed_extension=" .. destination_number .. ",extension_uuid="..extension_uuid..",domain_name="..domain_name..",domain_uuid="..domain_uuid..row.record_session.."]user/" .. destination_number .. "@" .. domain_name;
+										dial_string = "["..group_confirm.."sip_invite_domain="..domain_name..",dialed_extension=" .. destination_number .. ",extension_uuid="..extension_uuid..",domain_name="..domain_name..",domain_uuid="..domain_uuid.."]user/" .. destination_number .. "@" .. domain_name;
 										session:execute("bridge", dial_string);
 									elseif (tonumber(destination_number) == nil) then
 										--sip uri

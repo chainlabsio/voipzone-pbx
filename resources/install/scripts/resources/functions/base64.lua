@@ -3,7 +3,7 @@ base64 = {}
 -- encode a string and return a base64 string
 function base64.encode(s)
 	if package.loaded["mime"] then
-		local mime = require("mime.core");
+		local mime = require("mime");
 		return (mime.b64(s));
 	else
 		require "resources.functions.base64_alex";
@@ -14,7 +14,7 @@ end
 --decode a base64 string and return a string
 function base64.decode(s)
 	if package.loaded["mime"] then
-		local mime = require("mime.core");
+		local mime = require("mime");
 		return (mime.unb64(s));
 	else
 		require "resources.functions.base64_alex";

@@ -13,7 +13,7 @@
 --	   notice, this list of conditions and the following disclaimer in the
 --	   documentation and/or other materials provided with the distribution.
 --
---	THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+--	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 --	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 --	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
 --	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
@@ -85,7 +85,7 @@
 			end
 
 		--prevent processing for invalid user
-			if (user == "*97") or (user == "") then
+			if (user == "*97") then
 				source = "";
 				continue = false;
 			end
@@ -150,7 +150,7 @@
 								end
 
 							--get the caller hostname
-								local_hostname = trim(api:execute("switchname", ""));
+								local_hostname = trim(api:execute("hostname", ""));
 								--freeswitch.consoleLog("notice", "[xml_handler-directory.lua] local_hostname is " .. local_hostname .. "\n");
 
 							--add the file_exists function
@@ -197,10 +197,8 @@
 						if (debug["sql"]) then
 							freeswitch.consoleLog("notice", "[xml_handler] SQL: " .. sql .. "\n");
 						end
-						continue = false;
 						dbh:query(sql, function(row)
 							--general
-								continue = true;
 								domain_uuid = row.domain_uuid;
 								extension_uuid = row.extension_uuid;
 								extension = row.extension;
@@ -258,7 +256,8 @@
 								else
 									--set a default dial string
 										if (dial_string == null) then
-											dial_string = "{sip_invite_domain=" .. domain_name .. ",presence_id=" .. user .. "@" .. domain_name .. "}${sofia_contact(" .. extension .. "@" .. domain_name .. ")}";
+											local username = (#number_alias > 0) and number_alias or extension
+											dial_string = "{sip_invite_domain=" .. domain_name .. ",presence_id=" .. user .. "@" .. domain_name .. "}${sofia_contact(" .. username .. "@" .. domain_name .. ")}";
 										end
 									--set the an alternative dial string if the hostnames don't match
 										if (load_balancing) then
@@ -285,8 +284,8 @@
 				--get the voicemail from the database
 					if (continue) then
 						vm_enabled = "true";
-						if tonumber(user) == nil then
-   							sql = "SELECT * FROM v_voicemails WHERE domain_uuid = '" .. domain_uuid .. "' and voicemail_id = '" .. number_alias .. "' ";
+						if number_alias and #number_alias > 0 then
+							sql = "SELECT * FROM v_voicemails WHERE domain_uuid = '" .. domain_uuid .. "' and voicemail_id = '" .. number_alias .. "' ";
 						else
 							sql = "SELECT * FROM v_voicemails WHERE domain_uuid = '" .. domain_uuid .. "' and voicemail_id = '" .. user .. "' ";
 						end
